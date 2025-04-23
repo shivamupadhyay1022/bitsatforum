@@ -1,4 +1,5 @@
 import React from "react";
+import Navbar from "../components/Navbar";
 
 // Reusable Card Component (You can create a separate file for this if you want)
 const Card = ({ className, children }) => (
@@ -78,7 +79,9 @@ const Practice = () => {
   };
 
   return (
-    <div className="bg-gray-100 py-12">
+    <div>
+      <Navbar/>
+    <div className="bg-gray-100 py-12 pt-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
           BITSAT Question Papers
@@ -147,6 +150,7 @@ const Practice = () => {
           ]}
         />
       </div>
+    </div>
     </div>
   );
 };

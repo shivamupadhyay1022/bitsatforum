@@ -1,3 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.math-container {
+    width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+  }
+  
+  /* math-field {
+    width: 100%;
+    display: block;
+  } */
+
+  math-field::part(virtual-keyboard-toggle) {
+    display: none;
+  }
+
+  .ML__latex {
+    display: block;
+    white-space: normal;
+  }
+  
+  .ML__base, .ML__latex {
+    width: auto;
+  }
+  

@@ -1,21 +1,23 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import Navbar from "./components/Navbar";
 import About from "./pages/About";
 import Practice from "./pages/Practice";
 import Instructions from "./pages/Instructions";
 import SolvePaper from "./pages/SolvePaper";
+import Navbar from "./components/Navbar"
+import { ToastContainer } from "react-toastify";
+import "./components/ReactToastify.css"
+
 
 function App() {
   const [count, setCount] = useState(0);
 
   return (
     <>
-    <Navbar/>
+    {/* <Navbar/> */}
+    <ToastContainer/>    
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />

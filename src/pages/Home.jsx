@@ -5,10 +5,12 @@ import GetStartedSection from "../components/GetStartedSection";
 import Stats from "../components/Stats";
 import Testimonials from "../components/Testimonials";
 import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 
 function Home() {
   return (
     <div>
+      <Navbar/>
       <Hero />
       <Features/>
       <GetStartedSection/>
