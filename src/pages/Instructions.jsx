@@ -25,16 +25,22 @@ const Instructions = () => {
           <h2 className="text-lg font-semibold text-gray-800">General Instructions:</h2>
           <ul className="list-decimal list-inside space-y-2">
             <li>
-              <span className="font-medium">Duration:</span> The test is of 3 hours.
+              <span className="font-medium">Duration:</span> The test is of 3 hours (180 minutes).
             </li>
             <li>
-              <span className="font-medium">Sections:</span> The paper consists of Physics, Chemistry, Mathematics, English Proficiency, and Logical Reasoning.
+              <span className="font-medium">Mode:</span> Online (Computer-based) in English only.
             </li>
             <li>
-              <span className="font-medium">Total Questions:</span> There are 15 questions in total.
+              <span className="font-medium">Type of Questions:</span> Multiple Choice Questions (MCQs).
             </li>
             <li>
-              <span className="font-medium">Marking Scheme:</span> Each correct answer carries 3 marks, and each incorrect answer carries -1 mark. No marks are awarded for unattempted questions.
+              <span className="font-medium">Sections:</span> The paper consists of Physics, Chemistry, Mathematics/Biology, English Proficiency, and Logical Reasoning.
+            </li>
+            <li>
+              <span className="font-medium">Total Questions:</span> There are 130 questions in total.
+            </li>
+            <li>
+              <span className="font-medium">Marking Scheme:</span> Each correct answer carries +3 marks, and each incorrect answer carries -1 mark. No marks are awarded for unattempted questions.
             </li>
             <li>
               <span className="font-medium">Calculator:</span> Use of a virtual calculator is allowed.
@@ -52,21 +58,63 @@ const Instructions = () => {
             </li>
           </ul>
 
+          <h2 className="text-lg font-semibold text-gray-800">BITSAT 2024 Exam Pattern:</h2>
+          <div className="ml-5 mb-4">
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-2 px-3 font-medium">Section</th>
+                    <th className="text-center py-2 px-3 font-medium">Number of Questions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-gray-100">
+                    <td className="py-2 px-3">Physics</td>
+                    <td className="text-center py-2 px-3">30</td>
+                  </tr>
+                  <tr className="border-b border-gray-100">
+                    <td className="py-2 px-3">Chemistry</td>
+                    <td className="text-center py-2 px-3">30</td>
+                  </tr>
+                  <tr className="border-b border-gray-100">
+                    <td className="py-2 px-3">English Proficiency</td>
+                    <td className="text-center py-2 px-3">10</td>
+                  </tr>
+                  <tr className="border-b border-gray-100">
+                    <td className="py-2 px-3">Logical Reasoning</td>
+                    <td className="text-center py-2 px-3">20</td>
+                  </tr>
+                  <tr className="border-b border-gray-100">
+                    <td className="py-2 px-3">Mathematics / Biology*</td>
+                    <td className="text-center py-2 px-3">40</td>
+                  </tr>
+                  <tr className="border-b border-gray-100 font-medium">
+                    <td className="py-2 px-3">Total</td>
+                    <td className="text-center py-2 px-3">130</td>
+                  </tr>
+                  <tr className="bg-yellow-50">
+                    <td className="py-2 px-3">Bonus Questions (Optional)</td>
+                    <td className="text-center py-2 px-3">12</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p className="mt-2 text-sm italic">*Mathematics is for engineering aspirants, and Biology is for B.Pharm aspirants.</p>
+            </div>
+          </div>
+
           <h2 className="text-lg font-semibold text-gray-800">Detailed Instructions:</h2>
           <ul className="list-decimal list-inside space-y-2">
             <li>
-              <span className="font-medium">Question Paper Structure:</span>
+              <span className="font-medium">Bonus Questions:</span>
               <ul className="list-disc list-inside space-y-1 ml-5">
-                <li>Part I: Physics - 5 Questions</li>
-                <li>Part II: Chemistry - 5 Questions</li>
-                <li>Part III: Mathematics - 5 Questions</li>
-                {/* <li>Part IV: English Proficiency - 15 Questions</li> */}
-                {/* <li>Part V: Logical Reasoning - 15 Questions</li> */}
                 <li>
-                  Bonus: If a candidate answers all 15 questions, they have an option to
-                  attempt 6 (Six) extra questions (without negative marking).
-                  These 6 questions will be from Physics, Chemistry & Mathematics
-                  only; 2 questions from each part.
+                  If a candidate answers all 130 questions before time ends, they get an option to
+                  attempt 12 bonus questions (4 each from Physics, Chemistry, and Math/Biology).
+                </li>
+                <li className="text-red-600 font-medium">
+                  Important: Once you choose to attempt bonus questions, you cannot go back to the original 130 questions.
+                  If you press the back button during bonus questions, you will be prompted to confirm if you want to end the test.
                 </li>
               </ul>
             </li>
@@ -105,12 +153,41 @@ const Instructions = () => {
             <li><span className="font-medium">Technical Issues:</span> In case of any technical issues, please contact the invigilator immediately.</li>
             <li><span className="font-medium">Conduct:</span> Maintain silence and decorum in the examination hall. Any malpractice will lead to disqualification.</li>
           </ul>
+          <h2 className="text-lg font-semibold text-gray-800">Marking Scheme Details:</h2>
+          <div className="ml-5 mb-4">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="border-b border-blue-200">
+                    <th className="text-left py-2 px-3 font-medium">Answer Type</th>
+                    <th className="text-center py-2 px-3 font-medium">Marks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-blue-100">
+                    <td className="py-2 px-3">Correct Answer</td>
+                    <td className="text-center py-2 px-3 text-green-600">+3 marks</td>
+                  </tr>
+                  <tr className="border-b border-blue-100">
+                    <td className="py-2 px-3">Incorrect Answer</td>
+                    <td className="text-center py-2 px-3 text-red-600">-1 mark</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-3">Unattempted Question</td>
+                    <td className="text-center py-2 px-3">0 marks</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           <h2 className="text-lg font-semibold text-gray-800">Important Dates:</h2>
           <ul className="list-disc list-inside space-y-2 ml-5">
-            <li>Registration Start Date: 10th May 2024</li>
-            <li>Registration End Date: 30th June 2024</li>
-            <li>Exam Dates: 15th July 2024 to 20th July 2024</li>
-            <li>Admit Card Release Date: 10th July 2024</li>
+            <li>Registration Start Date: 1st February 2024</li>
+            <li>Registration End Date: 15th May 2024</li>
+            <li>Exam Dates: 21st May 2024 to 26th June 2024</li>
+            <li>Admit Card Release Date: 15th May 2024</li>
+            <li>Result Declaration: 5th July 2024</li>
           </ul>
         </div>
 

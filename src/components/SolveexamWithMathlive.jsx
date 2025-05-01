@@ -32,13 +32,21 @@ function SolveexamWithMathlive({
 
         {/* Options */}
         {options.map((opt) => (
-          <div key={opt.key} className="border-2 rounded-2xl border-slate-600">
+          <div
+            key={opt.key}
+            className="border-2  rounded-2xl border-slate-600"
+          >
             <label
               htmlFor={opt.id}
               onClick={() => handleChange(opt.label)}
               className="flex justify-between cursor-pointer px-4 py-3 items-center"
             >
-              <span>{parseTextWithImages(opt.value || "")}</span>
+              <div className="flex items-center">
+                <sppan>
+                  {opt?.label?.replace("op", "").toUpperCase() + "."}
+                </sppan>
+                <span>{parseTextWithImages(opt.value || "")}</span>
+              </div>
               <input
                 type="radio"
                 id={opt.id}
@@ -51,7 +59,12 @@ function SolveexamWithMathlive({
             </label>
           </div>
         ))}
-        <button className="mt-2 px-3 py-1 bg-red-200 hover:bg-red-300 text-red-800 rounded"  onClick={clearOption}>Clear Option</button>
+        <button
+          className="mt-2 px-3 py-1 bg-red-200 hover:bg-red-300 text-red-800 rounded"
+          onClick={clearOption}
+        >
+          Clear Option
+        </button>
       </div>
     </div>
   );

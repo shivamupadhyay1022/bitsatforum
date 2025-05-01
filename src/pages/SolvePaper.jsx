@@ -3,13 +3,14 @@ import Backnav from "../components/Backnav";
 import { supabase } from "../../supabase";
 import Questionblockcomp from "../components/Questionblockcomp";
 import SolveexamWithMathlive from "../components/SolveexamWithMathlive";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { parseTextWithImages } from "../components/parseTextWithImages";
 import { toast } from "react-toastify";
 
 function SolvePaper() {
   const [option, setOption] = useState("op0");
   const { id } = useParams();
+  const navigate = useNavigate();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentquestion, setCurrentQuestion] = useState();
   const [attemptedQuestions, setAttemptedQuestions] = useState([]);
@@ -24,6 +25,12 @@ function SolvePaper() {
   const [counter, setCounter] = useState(null);
   const [showSidebar, setShowSidebar] = useState(false);
   const sidebarRef = useRef(null);
+
+  // New state variables for bonus questions feature
+  const [bonusMode, setBonusMode] = useState(false);
+  const [showBonusButton, setShowBonusButton] = useState(false);
+  const [regularQuestionsCount, setRegularQuestionsCount] = useState(0);
+  const [isCalculating, setIsCalculating] = useState(false);
 
   useLayoutEffect(() => {
     if (examquestionlistid.length > 0) {
@@ -45,6 +52,11 @@ function SolvePaper() {
         setCounter(data.Duration * 60);
         const ids = data.Questions.split(",").map((id) => id.trim());
         SetexamquestionlistidId(ids);
+
+        // Calculate regular questions count (total - 12 bonus questions)
+        const totalQuestions = ids.length;
+        const regularCount = Math.max(0, totalQuestions - 12);
+        setRegularQuestionsCount(regularCount);
       }
     };
     fetchExam();
@@ -67,6 +79,22 @@ function SolvePaper() {
       sidebar.scrollTop = prevScrollTop;
     });
   }, [useroptionlist, currentQuestionIndex, counter]);
+
+  // Check if all questions have been attempted to show bonus button
+  useEffect(() => {
+    if (examquestionlistid.length > 0) {
+      // Count how many questions have been attempted
+      const attemptedCount = useroptionlist.filter(option => option !== undefined).length;
+
+      // Check if all questions have been attempted (all 130 questions)
+      const allQuestionsAttempted = attemptedCount >= examquestionlistid.length - 12;
+
+      // For debugging
+      console.log(`Attempted: ${attemptedCount}/${examquestionlistid.length}`);
+
+      setShowBonusButton(allQuestionsAttempted);
+    }
+  }, [useroptionlist, examquestionlistid]);
 
   // useEffect(() => {
   //   if (counter <= 0 && !showsubmit) {
@@ -95,25 +123,42 @@ function SolvePaper() {
   };
 
   const onSubmit = async () => {
-    const results = [];
-    for (const id of examquestionlistid) {
-      const { data } = await supabase
-        .from("questions")
-        .select("*")
-        .eq("id", id)
-        .single();
-      if (data) results.push(data);
-    }
-    Setexamquestionlist(results);
-    const newCorrectOptions = results.map((q) =>
-      q.correct.replace("option", "op")
-    );
-    setCorrectOptionList(newCorrectOptions);
-    const calculatedScore = newCorrectOptions.reduce((acc, curr, index) => {
-      return useroptionlist[index] === curr ? acc + 1 : acc;
-    }, 0);
-    setScore(calculatedScore);
-    setShowSubmit(true);
+    // Show loading screen
+    setIsCalculating(true);
+
+    // Use setTimeout to allow the loading screen to render before starting calculations
+    setTimeout(async () => {
+      try {
+        const results = [];
+        for (const id of examquestionlistid) {
+          const { data } = await supabase
+            .from("questions")
+            .select("*")
+            .eq("id", id)
+            .single();
+          if (data) results.push(data);
+        }
+        Setexamquestionlist(results);
+        const newCorrectOptions = results.map((q) =>
+          q.correct.replace("option", "op")
+        );
+        setCorrectOptionList(newCorrectOptions);
+        const calculatedScore = newCorrectOptions.reduce((acc, curr, index) => {
+          return useroptionlist[index] === curr ? acc + 1 : acc;
+        }, 0);
+        setScore(calculatedScore);
+
+        // Add a slight delay to make the loading animation visible
+        setTimeout(() => {
+          setIsCalculating(false);
+          setShowSubmit(true);
+        }, 1500);
+      } catch (error) {
+        console.error("Error calculating results:", error);
+        toast.error("An error occurred while calculating your results");
+        setIsCalculating(false);
+      }
+    }, 100);
   };
 
   const formatTime = (seconds) => {
@@ -132,6 +177,117 @@ function SolvePaper() {
       "op"
     );
     setCorrectOptionList(newCorrectOptions);
+  };
+
+  // Function to handle entering bonus mode
+  const enterBonusMode = () => {
+    // Count how many questions have been attempted
+    const attemptedCount = useroptionlist.filter(option => option !== undefined).length;
+
+    // Check if all questions have been attempted
+    const allQuestionsAttempted = attemptedCount >= examquestionlistid.length -12;
+
+    if (!allQuestionsAttempted) {
+      toast.error(`You must attempt all ${examquestionlistid.length} questions before accessing bonus questions. (${attemptedCount}/${examquestionlistid.length} attempted)`, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      return;
+    }
+
+    setBonusMode(true);
+    // Navigate to the first bonus question
+    if (regularQuestionsCount > 0) {
+      setCurrentQuestionIndex(regularQuestionsCount);
+    }
+    toast.info("You are now in bonus mode. You cannot go back to regular questions.", {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+  };
+
+  // Function to handle back button in bonus mode
+  const handleBackInBonusMode = () => {
+    if (confirm("Do you want to end the test? You cannot return to bonus questions.")) {
+      navigate("/");
+    }
+  };
+
+  // Loading screen component
+  const LoadingScreen = () => {
+    const [dots, setDots] = useState("");
+    const [progressStep, setProgressStep] = useState(0);
+    const steps = ["Gathering questions...", "Checking answers...", "Calculating score...", "Preparing results..."];
+
+    // Animate the dots
+    useEffect(() => {
+      const dotsInterval = setInterval(() => {
+        setDots(prev => {
+          if (prev.length >= 3) return "";
+          return prev + ".";
+        });
+      }, 400);
+
+      // Progress through the steps
+      const progressInterval = setInterval(() => {
+        setProgressStep(prev => (prev < steps.length - 1 ? prev + 1 : prev));
+      }, 1200);
+
+      return () => {
+        clearInterval(dotsInterval);
+        clearInterval(progressInterval);
+      };
+    }, []);
+
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[80vh]">
+        <div className="p-8 rounded-xl shadow-xl text-center bg-white max-w-md w-full">
+          <div className="mb-6 relative">
+            <div className="w-24 h-24 mx-auto border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-blue-500 text-xl font-bold">
+              BITSAT
+            </div>
+          </div>
+
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Calculating Results{dots}</h2>
+          <p className="text-gray-600 mb-8">Please wait while we process your answers</p>
+
+          <div className="mt-6 w-full bg-gray-200 rounded-full h-2.5 mb-2">
+            <div
+              className="bg-blue-600 h-2.5 rounded-full transition-all duration-500 ease-in-out"
+              style={{ width: `${(progressStep + 1) * 25}%` }}
+            ></div>
+          </div>
+
+          <div className="mt-2 text-left text-sm text-gray-500">
+            {steps.map((step, index) => (
+              <div key={index} className={`flex items-center mb-1 ${index <= progressStep ? 'text-blue-600 font-medium' : 'text-gray-400'}`}>
+                {index <= progressStep ? (
+                  <svg className="w-4 h-4 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                ) : (
+                  <div className="w-4 h-4 mr-2 rounded-full border border-gray-400"></div>
+                )}
+                {step}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const ResultScreen = () => {
@@ -216,10 +372,6 @@ function SolvePaper() {
   };
 
   const Sidebar = () => {
-    const allBeforeLast5Attempted = examquestionlistid
-      .slice(0, -5)
-      .every((_, index) => useroptionlist[index] !== undefined);
-
     return (
       <div
         ref={sidebarRef}
@@ -234,8 +386,29 @@ function SolvePaper() {
       >
         <div className="flex flex-col items-center mt-4 space-y-2 p-2">
           {examquestionlistid.map((_, index) => {
-            const isLast5 = index >= examquestionlistid.length - 5;
-            const isDisabled = isLast5 && !allBeforeLast5Attempted;
+            // Determine if this is a bonus question (last 12 questions)
+            const isBonusQuestion = regularQuestionsCount > 0 && index >= regularQuestionsCount;
+
+            // Count how many questions have been attempted
+            const attemptedCount = useroptionlist.filter(option => option !== undefined).length;
+
+            // Check if all questions have been attempted
+            const allQuestionsAttempted = attemptedCount >= examquestionlistid.length;
+
+            // Disable bonus questions if not in bonus mode or if all questions haven't been attempted
+            // Also disable regular questions if in bonus mode
+            const isDisabled = (isBonusQuestion && (!bonusMode || !allQuestionsAttempted)) ||
+                              (!isBonusQuestion && bonusMode);
+
+            // Determine button title based on status
+            let buttonTitle = "";
+            if (isBonusQuestion && !bonusMode) {
+              buttonTitle = "Complete all 130 questions to unlock bonus questions";
+            } else if (!isBonusQuestion && bonusMode) {
+              buttonTitle = "Cannot return to regular questions in bonus mode";
+            } else if (isBonusQuestion) {
+              buttonTitle = "Bonus question";
+            }
 
             return (
               <button
@@ -246,14 +419,14 @@ function SolvePaper() {
                 className={`rounded-full w-10 h-10 text-sm flex items-center justify-center font-semibold border-2 ${
                   useroptionlist[index]
                     ? "bg-green-500 text-white border-green-600"
+                    : isBonusQuestion && !isDisabled
+                    ? "bg-yellow-100 border-yellow-300"
                     : "bg-gray-100 border-gray-300"
                 } ${
                   index === currentQuestionIndex ? "ring-2 ring-blue-400" : ""
                 } ${isDisabled ? "opacity-40 cursor-not-allowed" : ""}`}
                 disabled={isDisabled}
-                title={
-                  isDisabled ? "Attempt all previous questions to unlock" : ""
-                }
+                title={buttonTitle}
               >
                 {index + 1}
               </button>
@@ -279,7 +452,9 @@ function SolvePaper() {
             showsubmit={showsubmit}
             onSubmit={onSubmit}
           />
-          {showsubmit ? (
+          {isCalculating ? (
+            <LoadingScreen />
+          ) : showsubmit ? (
             <ResultScreen />
           ) : (
             <div className="p-4">
@@ -290,33 +465,57 @@ function SolvePaper() {
                 setOption={(value) => handleOptionSelect(value)}
                 clearOption={() => handleOptionSelect(undefined)}
               />
-              <div className="mt-4 bg-slate-700 flex items-center px-4 fixed z-50 left-1 right-1 border-slate-400 bottom-0 h-12 rounded-t-3xl border-b-2 justify-between">
+              {!isCalculating && (
+                <div className="mt-4 bg-slate-700 flex items-center px-4 fixed z-50 left-1 right-1 border-slate-400 bottom-0 h-12 rounded-t-3xl border-b-2 justify-between">
                 <button
-                  onClick={() =>
-                    setCurrentQuestionIndex((prev) =>
-                      prev > 0 ? prev - 1 : prev
-                    )
-                  }
+                  onClick={() => {
+                    // If in bonus mode, show confirmation dialog
+                    if (bonusMode && currentQuestionIndex >= regularQuestionsCount) {
+                      handleBackInBonusMode();
+                    } else {
+                      setCurrentQuestionIndex((prev) =>
+                        prev > 0 ? prev - 1 : prev
+                      );
+                    }
+                  }}
                   className="px-4 py-2 text-white rounded"
                 >
                   Previous
                 </button>
+
+                {/* Show bonus button if all regular questions are attempted and not at the last regular question */}
+                {showBonusButton && !bonusMode && currentQuestionIndex !== regularQuestionsCount - 1 && (
+                  <button
+                    onClick={enterBonusMode}
+                    className="px-4 py-2 bg-yellow-500 text-white rounded"
+                  >
+                    Attempt Bonus
+                  </button>
+                )}
+
                 <button
                   onClick={onSubmit}
-                  className="px-4 py-2  text-white rounded"
+                  className="px-4 py-2 text-white rounded"
                 >
                   Submit
                 </button>
+
                 <button
                   onClick={() => {
-                    console.log(useroptionlist)
-                    if (currentQuestionIndex === 15){
-                      if (useroptionlist.filter(item => item !== undefined).length >= 15) {
-                        setCurrentQuestionIndex((prev) =>
-                          prev < examquestionlistid.length - 1 ? prev + 1 : prev
-                        );
-                      }else{
-                        toast.error("Complete All questions, to get to bonus questions", {
+                    // Check if we're at the last regular question and trying to enter bonus section
+                    const isLastRegularQuestion = currentQuestionIndex === regularQuestionsCount - 1;
+                    const isEnteringBonusSection = isLastRegularQuestion && !bonusMode && currentQuestionIndex < examquestionlistid.length - 1;
+
+                    // If trying to enter bonus section, check if all questions are attempted
+                    if (isEnteringBonusSection) {
+                      // Count how many questions have been attempted
+                      const attemptedCount = useroptionlist.filter(option => option !== undefined).length;
+
+                      // Check if all questions have been attempted
+                      const allQuestionsAttempted = attemptedCount >= examquestionlistid.length;
+
+                      if (!allQuestionsAttempted) {
+                        toast.error(`Complete all ${examquestionlistid.length} questions to unlock bonus questions (${attemptedCount}/${examquestionlistid.length} attempted)`, {
                           position: "bottom-right",
                           autoClose: 5000,
                           hideProgressBar: false,
@@ -326,20 +525,51 @@ function SolvePaper() {
                           progress: undefined,
                           theme: "light",
                         });
+                        return;
                       }
-                    }else{
+                    }
+
+                    // Check if we're at the last regular question with all questions attempted (show "Bonus Section")
+                    const isAtBonusSectionButton = currentQuestionIndex === regularQuestionsCount - 1 && showBonusButton;
+
+                    // Check if we're at the last question (either 130th without all questions attempted or 142nd)
+                    const isLastQuestion =
+                      (currentQuestionIndex === regularQuestionsCount - 1 && !showBonusButton) ||
+                      currentQuestionIndex === examquestionlistid.length - 1;
+
+                    if (isAtBonusSectionButton) {
+                      // If "Bonus Section" button is clicked, enter bonus mode
+                      enterBonusMode();
+                    } else if (isLastQuestion) {
+                      // If at last question, submit the quiz
+                      onSubmit();
+                    } else {
+                      // Normal next button behavior
                       setCurrentQuestionIndex((prev) =>
                         prev < examquestionlistid.length - 1 ? prev + 1 : prev
                       );
                     }
-                    
                   }}
-                  className="px-4 py-2  text-white rounded"
+                  className={`px-4 py-2 text-white rounded ${
+                    // Change button color for Bonus Section
+                    currentQuestionIndex === regularQuestionsCount - 1 && showBonusButton ?
+                    'bg-yellow-500 hover:bg-yellow-600' : ''
+                  }`}
                 >
-                  Next
+                  {/* Dynamic button text based on position and completion */}
+                  {currentQuestionIndex === regularQuestionsCount - 1 ? (
+                    // At 130th question (last regular question)
+                    showBonusButton ? "Bonus Section" : "Finish"
+                  ) : currentQuestionIndex === examquestionlistid.length - 1 ? (
+                    // At 142nd question (last bonus question)
+                    "Finish"
+                  ) : (
+                    // Normal case
+                    "Next"
+                  )}
                 </button>
-
               </div>
+              )}
             </div>
           )}
         </div>

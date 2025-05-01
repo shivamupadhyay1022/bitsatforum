@@ -104,6 +104,18 @@ const Practice = () => {
           ]}
         />
         <YearSection
+          year="BITSAT 2024"
+          sessions={[
+            {
+              name: "Sample Test Paper",
+              questions: "130 + 12 Bonus Questions",
+              time: "180 Min",
+              practiceLink: "/instructions/7",
+              downloadLink: "#",
+            },
+          ]}
+        />
+        <YearSection
           year="BITSAT 2023"
           sessions={[
             {
