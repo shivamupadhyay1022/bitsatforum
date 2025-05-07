@@ -31,6 +31,7 @@ function SolvePaper() {
   const [showBonusButton, setShowBonusButton] = useState(false);
   const [regularQuestionsCount, setRegularQuestionsCount] = useState(0);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [reviewQuestions, setReviewQuestions] = useState([]);
 
   useLayoutEffect(() => {
     if (examquestionlistid.length > 0) {
@@ -83,18 +84,24 @@ function SolvePaper() {
   // Check if all questions have been attempted to show bonus button
   useEffect(() => {
     if (examquestionlistid.length > 0) {
-      // Count how many questions have been attempted
-      const attemptedCount = useroptionlist.filter(option => option !== undefined).length;
+      // Count questions that are truly attempted (not marked for review)
+      const attemptedCount = useroptionlist.reduce((count, option, index) => {
+        // Only count if option is defined AND not marked for review
+        if (option !== undefined && !reviewQuestions.includes(index)) {
+          return count + 1;
+        }
+        return count;
+      }, 0);
 
       // Check if all questions have been attempted (all 130 questions)
       const allQuestionsAttempted = attemptedCount >= examquestionlistid.length - 12;
 
       // For debugging
-      console.log(`Attempted: ${attemptedCount}/${examquestionlistid.length}`);
+      console.log(`Attempted: ${attemptedCount}/${examquestionlistid.length} (${reviewQuestions.length} marked for review)`);
 
       setShowBonusButton(allQuestionsAttempted);
     }
-  }, [useroptionlist, examquestionlistid]);
+  }, [useroptionlist, examquestionlistid, reviewQuestions]);
 
   // useEffect(() => {
   //   if (counter <= 0 && !showsubmit) {
@@ -116,13 +123,10 @@ function SolvePaper() {
     if (!error && data) setCurrentQuestion(data);
   };
 
-  const calculateScore = () => {
-    return correctoptionlist.reduce((acc, curr, index) => {
-      return useroptionlist[index] === curr ? acc + 1 : acc;
-    }, 0);
-  };
-
   const onSubmit = async () => {
+    // Prevent multiple submissions
+    if (isCalculating || showsubmit) return;
+
     // Show loading screen
     setIsCalculating(true);
 
@@ -161,12 +165,6 @@ function SolvePaper() {
     }, 100);
   };
 
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-  };
-
   const handleOptionSelect = (selectedOption) => {
     const newUserOptions = [...useroptionlist];
     newUserOptions[currentQuestionIndex] = selectedOption;
@@ -177,18 +175,45 @@ function SolvePaper() {
       "op"
     );
     setCorrectOptionList(newCorrectOptions);
+
+    // If this question was marked for review, unmark it when an option is selected
+    if (reviewQuestions.includes(currentQuestionIndex)) {
+      toggleReviewQuestion(currentQuestionIndex);
+    }
+  };
+
+  // Function to toggle a question's review status
+  const toggleReviewQuestion = (index) => {
+    setReviewQuestions(prev => {
+      if (prev.includes(index)) {
+        // Remove from review if already there
+        return prev.filter(i => i !== index);
+      } else {
+        // Add to review if not there
+        return [...prev, index];
+      }
+    });
   };
 
   // Function to handle entering bonus mode
   const enterBonusMode = () => {
-    // Count how many questions have been attempted
-    const attemptedCount = useroptionlist.filter(option => option !== undefined).length;
+    // Count questions that are truly attempted (not marked for review)
+    const attemptedCount = useroptionlist.reduce((count, option, index) => {
+      // Only count if option is defined AND not marked for review
+      if (option !== undefined && !reviewQuestions.includes(index)) {
+        return count + 1;
+      }
+      return count;
+    }, 0);
 
     // Check if all questions have been attempted
-    const allQuestionsAttempted = attemptedCount >= examquestionlistid.length -12;
+    const allQuestionsAttempted = attemptedCount >= examquestionlistid.length - 12;
+
+    // Count questions marked for review
+    const reviewCount = reviewQuestions.length;
 
     if (!allQuestionsAttempted) {
-      toast.error(`You must attempt all ${examquestionlistid.length} questions before accessing bonus questions. (${attemptedCount}/${examquestionlistid.length} attempted)`, {
+      toast.error(`You must attempt all ${examquestionlistid.length} questions before accessing bonus questions. (${attemptedCount}/${examquestionlistid.length} attempted, ${reviewCount} marked for review)`, {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -402,7 +427,9 @@ function SolvePaper() {
 
             // Determine button title based on status
             let buttonTitle = "";
-            if (isBonusQuestion && !bonusMode) {
+            if (reviewQuestions.includes(index)) {
+              buttonTitle = "Question marked for review";
+            } else if (isBonusQuestion && !bonusMode) {
               buttonTitle = "Complete all 130 questions to unlock bonus questions";
             } else if (!isBonusQuestion && bonusMode) {
               buttonTitle = "Cannot return to regular questions in bonus mode";
@@ -417,11 +444,13 @@ function SolvePaper() {
                   if (!isDisabled) setCurrentQuestionIndex(index);
                 }}
                 className={`rounded-full w-10 h-10 text-sm flex items-center justify-center font-semibold border-2 ${
-                  useroptionlist[index]
-                    ? "bg-green-500 text-white border-green-600"
+                  reviewQuestions.includes(index)
+                    ? "bg-blue-500 text-white border-blue-600" // Blue for review
+                    : useroptionlist[index]
+                    ? "bg-green-500 text-white border-green-600" // Green for attempted
                     : isBonusQuestion && !isDisabled
-                    ? "bg-yellow-100 border-yellow-300"
-                    : "bg-gray-100 border-gray-300"
+                    ? "bg-yellow-100 border-yellow-300" // Yellow for bonus
+                    : "bg-gray-100 border-gray-300" // Gray for unattempted
                 } ${
                   index === currentQuestionIndex ? "ring-2 ring-blue-400" : ""
                 } ${isDisabled ? "opacity-40 cursor-not-allowed" : ""}`}
@@ -464,6 +493,8 @@ function SolvePaper() {
                 option={useroptionlist[currentQuestionIndex] || ""}
                 setOption={(value) => handleOptionSelect(value)}
                 clearOption={() => handleOptionSelect(undefined)}
+                isMarkedForReview={reviewQuestions.includes(currentQuestionIndex)}
+                toggleReview={() => toggleReviewQuestion(currentQuestionIndex)}
               />
               {!isCalculating && (
                 <div className="mt-4 bg-slate-700 flex items-center px-4 fixed z-50 left-1 right-1 border-slate-400 bottom-0 h-12 rounded-t-3xl border-b-2 justify-between">
@@ -508,14 +539,23 @@ function SolvePaper() {
 
                     // If trying to enter bonus section, check if all questions are attempted
                     if (isEnteringBonusSection) {
-                      // Count how many questions have been attempted
-                      const attemptedCount = useroptionlist.filter(option => option !== undefined).length;
+                      // Count questions that are truly attempted (not marked for review)
+                      const attemptedCount = useroptionlist.reduce((count, option, index) => {
+                        // Only count if option is defined AND not marked for review
+                        if (option !== undefined && !reviewQuestions.includes(index)) {
+                          return count + 1;
+                        }
+                        return count;
+                      }, 0);
 
                       // Check if all questions have been attempted
                       const allQuestionsAttempted = attemptedCount >= examquestionlistid.length;
 
+                      // Count questions marked for review
+                      const reviewCount = reviewQuestions.length;
+
                       if (!allQuestionsAttempted) {
-                        toast.error(`Complete all ${examquestionlistid.length} questions to unlock bonus questions (${attemptedCount}/${examquestionlistid.length} attempted)`, {
+                        toast.error(`Complete all ${examquestionlistid.length} questions to unlock bonus questions (${attemptedCount}/${examquestionlistid.length} attempted, ${reviewCount} marked for review)`, {
                           position: "bottom-right",
                           autoClose: 5000,
                           hideProgressBar: false,

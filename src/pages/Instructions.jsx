@@ -22,6 +22,63 @@ const Instructions = () => {
       <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl p-8">
         <h1 className="text-2xl font-semibold text-gray-800 mb-6 text-center">BITSAT 2024 - Instructions</h1>
         <div className="space-y-4 text-gray-700 text-sm">
+          <h2 className="text-lg font-semibold text-gray-800">Exam Interface Guide:</h2>
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+            <h3 className="font-medium text-gray-800 mb-2">Question Navigation:</h3>
+            <ul className="list-disc list-inside space-y-1 ml-3">
+              <li>
+                <span className="font-medium">Question Panel:</span> A sidebar on the left shows all question numbers. Click any number to jump to that question.
+              </li>
+              <li>
+                <span className="font-medium">Navigation Buttons:</span> Use "Previous" and "Next" buttons at the bottom to move between questions.
+              </li>
+              <li>
+                <span className="font-medium">Submit Button:</span> Click to end the test and see your results.
+              </li>
+            </ul>
+
+            <h3 className="font-medium text-gray-800 mt-4 mb-2">Question Status Indicators:</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <ul className="space-y-2">
+                  <li className="flex items-center">
+                    <div className="w-6 h-6 rounded-full bg-gray-100 border-2 border-gray-300 mr-2"></div>
+                    <span>Unattempted Question</span>
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-6 h-6 rounded-full bg-green-500 border-2 border-green-600 mr-2"></div>
+                    <span>Attempted Question</span>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <ul className="space-y-2">
+                  <li className="flex items-center">
+                    <div className="w-6 h-6 rounded-full bg-blue-500 border-2 border-blue-600 mr-2"></div>
+                    <span>Marked for Review</span>
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-6 h-6 rounded-full bg-yellow-100 border-2 border-yellow-300 mr-2"></div>
+                    <span>Bonus Question</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <h3 className="font-medium text-gray-800 mt-4 mb-2">Special Features:</h3>
+            <ul className="list-disc list-inside space-y-1 ml-3">
+              <li>
+                <span className="font-medium">Mark for Review:</span> Use the "Mark for Review" button next to "Clear Option" to flag questions you want to revisit later.
+              </li>
+              <li>
+                <span className="font-medium">Bonus Section:</span> After attempting all 130 questions, the "Next" button on the last question will change to "Bonus Section" to access bonus questions.
+              </li>
+              <li>
+                <span className="font-medium">Timer:</span> A countdown timer at the top shows remaining time. The test auto-submits when time runs out.
+              </li>
+            </ul>
+          </div>
+
           <h2 className="text-lg font-semibold text-gray-800">General Instructions:</h2>
           <ul className="list-decimal list-inside space-y-2">
             <li>

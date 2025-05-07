@@ -3,9 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "../../supabase";
 
 function Backnav({ title, timer, toggleSidebar, onSubmit, showsubmit }) {
-  const [counter, setCounter] = useState(10); // Start as null
+  const [counter, setCounter] = useState(timer || 10); // Initialize with provided timer or default
   const navigate = useNavigate();
   const [showdelaytext, setShowDelayedText] = useState(false);
+  const [timerSubmitted, setTimerSubmitted] = useState(false); // Track if timer has triggered submission
+  const [isSubmitting, setIsSubmitting] = useState(false); // Track if submission is in progress
 
   const {id} =useParams()
 
@@ -19,6 +21,20 @@ function Backnav({ title, timer, toggleSidebar, onSubmit, showsubmit }) {
     }
   }, [id]);
 
+  // Reset timerSubmitted if showsubmit changes to false (quiz restarted)
+  useEffect(() => {
+    if (!showsubmit) {
+      setTimerSubmitted(false);
+      setIsSubmitting(false);
+    }
+  }, [showsubmit]);
+
+  // Wrap the onSubmit function to set isSubmitting flag
+  const handleSubmit = () => {
+    setIsSubmitting(true);
+    onSubmit();
+  };
+
   async function fetchexam() {
     if (!id) return;
     try {
@@ -29,24 +45,38 @@ function Backnav({ title, timer, toggleSidebar, onSubmit, showsubmit }) {
         .limit(1);
       if (error) throw error;
       if (data && data.length > 0) {
-        setCounter(data[0]?.Duration * 60);
+        // Only set counter if not in showsubmit mode
+        if (!showsubmit) {
+          setCounter(data[0]?.Duration * 60);
+        }
         setShowDelayedText(true);
       }
     } catch (error) {
       console.log(error);
     }
   }
+  // Update counter when timer prop changes
+  useEffect(() => {
+    if (timer !== undefined && timer !== null) {
+      setCounter(timer);
+    }
+  }, [timer]);
+
   // Start countdown when counter is set and > 0
   useEffect(() => {
-    if (counter > 0) {
-      const timer = setInterval(() => {
+    // Run the timer if not already submitted and not in showsubmit mode
+    // or if we're in the process of submitting (to continue counting down)
+    if (counter > 0 && (!showsubmit || isSubmitting) && !timerSubmitted) {
+      const timerInterval = setInterval(() => {
         setCounter((prevCounter) => prevCounter - 1);
       }, 1000);
-      return () => clearInterval(timer); // Clear timer on unmount or when counter changes
-    } else {
-      onSubmit(); // Trigger the function when counter hits 0
+      return () => clearInterval(timerInterval); // Clear timer on unmount or when counter changes
+    } else if (counter <= 0 && !showsubmit && !timerSubmitted) {
+      // Trigger submission only once when timer hits 0
+      setTimerSubmitted(true);
+      handleSubmit(); // Trigger the function when timer hits 0
     }
-  }, [counter]);
+  }, [counter, showsubmit, timerSubmitted, isSubmitting, onSubmit]);
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;

@@ -6,6 +6,8 @@ function SolveexamWithMathlive({
   option,
   setOption,
   clearOption,
+  isMarkedForReview,
+  toggleReview,
 }) {
   // Extract options dynamically from the question object
   const options = Object.entries(currentquestion || {})
@@ -59,12 +61,25 @@ function SolveexamWithMathlive({
             </label>
           </div>
         ))}
-        <button
-          className="mt-2 px-3 py-1 bg-red-200 hover:bg-red-300 text-red-800 rounded"
-          onClick={clearOption}
-        >
-          Clear Option
-        </button>
+        <div className="mt-2 flex justify-between items-center">
+          <button
+            className="px-3 py-1 bg-red-200 hover:bg-red-300 text-red-800 rounded"
+            onClick={clearOption}
+          >
+            Clear Option
+          </button>
+
+          <button
+            className={`px-3 py-1 ${
+              isMarkedForReview
+                ? "bg-blue-600 hover:bg-blue-700 text-white"
+                : "bg-blue-100 hover:bg-blue-200 text-blue-800"
+            } rounded`}
+            onClick={toggleReview}
+          >
+            {isMarkedForReview ? "Unmark Review" : "Mark for Review"}
+          </button>
+        </div>
       </div>
     </div>
   );
