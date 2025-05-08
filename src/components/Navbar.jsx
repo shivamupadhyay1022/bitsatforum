@@ -7,11 +7,11 @@ function Navbar() {
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
   return (
-    <nav className="bg-white shadow-md fixed z-[100] px-16 left-0 right-0">
-      <div className="container mx-auto px-4 flex justify-between items-center py-4">
+    <nav className="bg-white shadow-md fixed z-[100] left-0 right-0">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-4">
         {/* Logo */}
         <div className="flex items-center">
-          <span className="text-2xl font-bold flex items-center text-blue-800">
+          <span className="text-xl sm:text-2xl font-bold flex items-center text-blue-800">
             BITSAT Forum
           </span>
         </div>
@@ -126,18 +126,25 @@ function Navbar() {
 
       {/* Mobile Dropdown Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-white shadow-md absolute w-full left-0 top-[60px]">
-          <ul className="flex flex-col items-center space-y-4 font-semibold py-4 text-gray-400">
+        <>
+          {/* Overlay to close menu when clicking outside */}
+          <div
+            className="fixed inset-0 bg-black bg-opacity-25 md:hidden z-10"
+            onClick={() => setMenuOpen(false)}
+            aria-hidden="true"
+          ></div>
+          <div className="md:hidden bg-white shadow-md absolute w-full left-0 top-[72px] border-t border-gray-100 z-20">
+            <ul className="flex flex-col items-center space-y-4 font-semibold py-6 px-4 text-gray-400">
             {["Home", "About", "Practice", "Mock", "Pricing", "FAQ", "Contact"].map(
               (item) => (
-                <li key={item}>
+                <li key={item} className="w-full">
                   <NavLink
                     to={`/${item.toLowerCase().replace(" ", "-")}`}
                     className={({ isActive }) =>
-                      `block py-2 text-lg ${
+                      `block py-3 px-4 text-lg w-full text-center rounded-lg ${
                         isActive
-                          ? "text-blue-500 border-b-2 border-blue-500"
-                          : "text-gray-700"
+                          ? "text-blue-500 bg-blue-50 font-bold"
+                          : "text-gray-700 hover:bg-gray-50"
                       }`
                     }
                     onClick={() => setMenuOpen(false)} // Close menu on click
@@ -147,8 +154,9 @@ function Navbar() {
                 </li>
               )
             )}
-            <li>
+            <li className="w-full">
               <button
+                className="w-full p-3 rounded-xl text-white bg-orange-500 flex items-center justify-center gap-2 mt-4"
                 onClick={() => {
                   //   signOut(auth)
                   //     .then(() => {
@@ -176,6 +184,7 @@ function Navbar() {
                   //         theme: "light",
                   //       });
                   //     });
+                  setMenuOpen(false); // Close menu on click
                 }}
               >
                 <svg
@@ -192,10 +201,12 @@ function Navbar() {
                     d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
                   />
                 </svg>
+                Sign In
               </button>
             </li>
           </ul>
         </div>
+        </>
       )}
     </nav>
   );

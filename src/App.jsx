@@ -9,6 +9,10 @@ import SolvePaper from "./pages/SolvePaper";
 import Navbar from "./components/Navbar"
 import { ToastContainer } from "react-toastify";
 import "./components/ReactToastify.css"
+import Mock from "./pages/Mock";
+import Pricing from "./pages/Pricing";
+import FAQ from "./pages/FAQ";
+import Contact from "./pages/Contact";
 
 
 function App() {
@@ -23,6 +27,10 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/practice" element={<Practice />} />
+        <Route path="/mock" element={<Mock />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/instructions/:id" element={<Instructions />} />
         <Route path="/paper/:id" element={<SolvePaper />} />
       </Routes>
