@@ -38,45 +38,96 @@ const Instructions = () => {
             </ul>
 
             <h3 className="font-medium text-gray-800 mt-4 mb-2">Question Status Indicators:</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <ul className="space-y-2">
-                  <li className="flex items-center">
-                    <div className="w-6 h-6 rounded-full bg-gray-100 border-2 border-gray-300 mr-2"></div>
-                    <span>Unattempted Question</span>
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-6 h-6 rounded-full bg-green-500 border-2 border-green-600 mr-2"></div>
-                    <span>Attempted Question</span>
-                  </li>
-                </ul>
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+              <p className="text-sm text-gray-600 mb-3">The sidebar shows the status of each question using these color codes:</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <ul className="space-y-3">
+                    <li className="flex items-center">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-white border-2 border-gray-300 mr-3 text-gray-700 font-medium">1</div>
+                      <div>
+                        <span className="font-medium block">Not Visited</span>
+                        <span className="text-xs text-gray-500">Questions you haven't seen yet</span>
+                      </div>
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-red-500 border-2 border-red-600 mr-3 text-white font-medium">2</div>
+                      <div>
+                        <span className="font-medium block">Visited but Not Answered</span>
+                        <span className="text-xs text-gray-500">Questions you've seen but not selected an answer</span>
+                      </div>
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-green-500 border-2 border-green-600 mr-3 text-white font-medium">3</div>
+                      <div>
+                        <span className="font-medium block">Answered</span>
+                        <span className="text-xs text-gray-500">Questions with a selected answer</span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <ul className="space-y-3">
+                    <li className="flex items-center">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-blue-500 border-2 border-blue-600 mr-3 text-white font-medium">4</div>
+                      <div>
+                        <span className="font-medium block">Marked for Review (Not Answered)</span>
+                        <span className="text-xs text-gray-500">Questions you want to revisit later</span>
+                      </div>
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-r from-blue-500 to-green-500 border-2 border-blue-600 mr-3 text-white font-medium">5</div>
+                      <div>
+                        <span className="font-medium block">Marked for Review (Answered)</span>
+                        <span className="text-xs text-gray-500">Questions with an answer that you want to revisit</span>
+                      </div>
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-yellow-100 border-2 border-yellow-300 mr-3 text-yellow-800 font-medium">B</div>
+                      <div>
+                        <span className="font-medium block">Bonus Question</span>
+                        <span className="text-xs text-gray-500">Extra questions available after completing all regular questions</span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
               </div>
-              <div>
-                <ul className="space-y-2">
-                  <li className="flex items-center">
-                    <div className="w-6 h-6 rounded-full bg-blue-500 border-2 border-blue-600 mr-2"></div>
-                    <span>Marked for Review</span>
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-6 h-6 rounded-full bg-yellow-100 border-2 border-yellow-300 mr-2"></div>
-                    <span>Bonus Question</span>
-                  </li>
-                </ul>
+
+              <div className="mt-4 bg-blue-50 p-3 rounded-lg border border-blue-200">
+                <p className="text-sm text-blue-800">
+                  <span className="font-medium">Note:</span> For bonus question eligibility, both answered questions and questions marked for review with answers are counted as attempted.
+                </p>
               </div>
             </div>
 
             <h3 className="font-medium text-gray-800 mt-4 mb-2">Special Features:</h3>
-            <ul className="list-disc list-inside space-y-1 ml-3">
-              <li>
-                <span className="font-medium">Mark for Review:</span> Use the "Mark for Review" button next to "Clear Option" to flag questions you want to revisit later.
-              </li>
-              <li>
-                <span className="font-medium">Bonus Section:</span> After attempting all 130 questions, the "Next" button on the last question will change to "Bonus Section" to access bonus questions.
-              </li>
-              <li>
-                <span className="font-medium">Timer:</span> A countdown timer at the top shows remaining time. The test auto-submits when time runs out.
-              </li>
-            </ul>
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                <h4 className="font-medium text-gray-800 mb-1">Mark for Review</h4>
+                <p className="text-sm text-gray-600 mb-2">Use the "Mark for Review" button next to "Clear Option" to flag questions you want to revisit later.</p>
+                <ul className="list-disc list-inside space-y-1 ml-3 text-sm text-gray-600">
+                  <li>Questions marked for review appear in <span className="text-blue-600 font-medium">blue</span> in the sidebar</li>
+                  <li>If you've also answered the question, it appears as a <span className="text-blue-600 font-medium">blue-green gradient</span></li>
+                  <li>Questions marked for review with answers count toward bonus question eligibility</li>
+                </ul>
+              </div>
+
+              <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                <h4 className="font-medium text-gray-800 mb-1">Bonus Section</h4>
+                <p className="text-sm text-gray-600 mb-2">After answering all 130 regular questions, you can access 12 bonus questions.</p>
+                <ul className="list-disc list-inside space-y-1 ml-3 text-sm text-gray-600">
+                  <li>The "Next" button on the last regular question will change to "Bonus Section"</li>
+                  <li>Once you enter the bonus section, you cannot return to the regular questions</li>
+                  <li>Bonus questions appear with a <span className="text-yellow-700 font-medium">yellow</span> background in the sidebar</li>
+                </ul>
+              </div>
+
+              <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                <h4 className="font-medium text-gray-800 mb-1">Timer</h4>
+                <p className="text-sm text-gray-600">A countdown timer at the top shows remaining time. The test auto-submits when time runs out.</p>
+              </div>
+            </div>
           </div>
 
           <h2 className="text-lg font-semibold text-gray-800">General Instructions:</h2>

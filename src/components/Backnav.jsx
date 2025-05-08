@@ -2,7 +2,7 @@ import React, { useEffect, useState, useLayoutEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "../../supabase";
 
-function Backnav({ title, timer, toggleSidebar, onSubmit, showsubmit }) {
+function Backnav({ title, timer, toggleSidebar, onSubmit, showsubmit, setHandleSubmit = null }) {
   const [counter, setCounter] = useState(timer || 10); // Initialize with provided timer or default
   const navigate = useNavigate();
   const [showdelaytext, setShowDelayedText] = useState(false);
@@ -29,11 +29,39 @@ function Backnav({ title, timer, toggleSidebar, onSubmit, showsubmit }) {
     }
   }, [showsubmit]);
 
-  // Wrap the onSubmit function to set isSubmitting flag
+  // Wrap the onSubmit function to set isSubmitting flag and reset timer
   const handleSubmit = () => {
     setIsSubmitting(true);
-    onSubmit();
+
+    // Start a timer to count down to zero
+    const currentCount = counter;
+
+    // Force the counter to a value that will take about 2 seconds to count down
+    // This ensures the countdown is visible regardless of the current timer value
+    const startValue = Math.min(currentCount, 40);
+    setCounter(startValue);
+
+    // Start the countdown animation
+    const countdownInterval = setInterval(() => {
+      setCounter(prev => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval);
+          // Call onSubmit directly when the timer reaches zero
+          onSubmit();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 50); // Speed up the countdown for visual effect
   };
+
+  // Expose handleSubmit to parent component if setHandleSubmit is provided
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (typeof setHandleSubmit === 'function') {
+      setHandleSubmit(() => handleSubmit); // Pass as a function to avoid immediate execution
+    }
+  }, []);
 
   async function fetchexam() {
     if (!id) return;
@@ -76,7 +104,8 @@ function Backnav({ title, timer, toggleSidebar, onSubmit, showsubmit }) {
       setTimerSubmitted(true);
       handleSubmit(); // Trigger the function when timer hits 0
     }
-  }, [counter, showsubmit, timerSubmitted, isSubmitting, onSubmit]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [counter, showsubmit, timerSubmitted, isSubmitting]);
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;

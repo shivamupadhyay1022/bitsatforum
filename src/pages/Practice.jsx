@@ -107,10 +107,17 @@ const Practice = () => {
           year="BITSAT 2024"
           sessions={[
             {
-              name: "Sample Test Paper",
+              name: "Sample Test Paper 1",
               questions: "130 + 12 Bonus Questions",
               time: "180 Min",
-              practiceLink: "/instructions/7",
+              practiceLink: "/instructions/8",
+              downloadLink: "#",
+            },
+            {
+              name: "Sample Test Paper 2",
+              questions: "130 + 12 Bonus Questions",
+              time: "180 Min",
+              practiceLink: "/instructions/9",
               downloadLink: "#",
             },
           ]}

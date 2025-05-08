@@ -32,10 +32,20 @@ function SolvePaper() {
   const [regularQuestionsCount, setRegularQuestionsCount] = useState(0);
   const [isCalculating, setIsCalculating] = useState(false);
   const [reviewQuestions, setReviewQuestions] = useState([]);
+  const [visitedQuestions, setVisitedQuestions] = useState([]);
+  const [handleSubmitFn, setHandleSubmitFn] = useState(null);
 
   useLayoutEffect(() => {
     if (examquestionlistid.length > 0) {
       fetchQuestion(examquestionlistid[currentQuestionIndex]);
+
+      // Mark the current question as visited
+      setVisitedQuestions(prev => {
+        if (!prev.includes(currentQuestionIndex)) {
+          return [...prev, currentQuestionIndex];
+        }
+        return prev;
+      });
     }
   }, [examquestionlistid, currentQuestionIndex]);
 
@@ -84,10 +94,10 @@ function SolvePaper() {
   // Check if all questions have been attempted to show bonus button
   useEffect(() => {
     if (examquestionlistid.length > 0) {
-      // Count questions that are truly attempted (not marked for review)
+      // Count questions that are answered (including those marked for review)
       const attemptedCount = useroptionlist.reduce((count, option, index) => {
-        // Only count if option is defined AND not marked for review
-        if (option !== undefined && !reviewQuestions.includes(index)) {
+        // Count if option is defined (regardless of review status)
+        if (option !== undefined) {
           return count + 1;
         }
         return count;
@@ -127,13 +137,20 @@ function SolvePaper() {
     // Prevent multiple submissions
     if (isCalculating || showsubmit) return;
 
-    // Show loading screen
+    // Show loading screen immediately
     setIsCalculating(true);
+    console.log("Submitting quiz...");
 
     // Use setTimeout to allow the loading screen to render before starting calculations
     setTimeout(async () => {
       try {
+        // Step 1: Fetch all question details
+        console.log("Fetching question details...");
         const results = [];
+
+        // Simulate slower loading for better user experience
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         for (const id of examquestionlistid) {
           const { data } = await supabase
             .from("questions")
@@ -141,22 +158,44 @@ function SolvePaper() {
             .eq("id", id)
             .single();
           if (data) results.push(data);
+
+          // Add a small delay between fetches to make the loading more visible
+          await new Promise(resolve => setTimeout(resolve, 50));
         }
-        Setexamquestionlist(results);
+
+        console.log(`Fetched ${results.length} questions`);
+
+        // Step 2: Process the results
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Prepare all data BEFORE showing the results screen
+        // This ensures everything is ready when the loading screen disappears
         const newCorrectOptions = results.map((q) =>
           q.correct.replace("option", "op")
         );
-        setCorrectOptionList(newCorrectOptions);
+
+        // Step 3: Calculate the score
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         const calculatedScore = newCorrectOptions.reduce((acc, curr, index) => {
           return useroptionlist[index] === curr ? acc + 1 : acc;
         }, 0);
+
+        // Step 4: Prepare the results display
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Set all the state variables with the calculated data
+        Setexamquestionlist(results);
+        setCorrectOptionList(newCorrectOptions);
         setScore(calculatedScore);
 
-        // Add a slight delay to make the loading animation visible
-        setTimeout(() => {
-          setIsCalculating(false);
-          setShowSubmit(true);
-        }, 1500);
+        // Add a final delay to ensure all state updates have been processed
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Only show the results after all processing is complete and state is updated
+        console.log("Showing results screen");
+        setIsCalculating(false);
+        setShowSubmit(true);
       } catch (error) {
         console.error("Error calculating results:", error);
         toast.error("An error occurred while calculating your results");
@@ -197,10 +236,10 @@ function SolvePaper() {
 
   // Function to handle entering bonus mode
   const enterBonusMode = () => {
-    // Count questions that are truly attempted (not marked for review)
-    const attemptedCount = useroptionlist.reduce((count, option, index) => {
-      // Only count if option is defined AND not marked for review
-      if (option !== undefined && !reviewQuestions.includes(index)) {
+    // Count questions that are answered (including those marked for review)
+    const attemptedCount = useroptionlist.reduce((count, option) => {
+      // Count if option is defined (regardless of review status)
+      if (option !== undefined) {
         return count + 1;
       }
       return count;
@@ -212,8 +251,11 @@ function SolvePaper() {
     // Count questions marked for review
     const reviewCount = reviewQuestions.length;
 
+    // Count questions that are marked for review but not answered
+    const reviewedButNotAnsweredCount = reviewQuestions.filter(index => !useroptionlist[index]).length;
+
     if (!allQuestionsAttempted) {
-      toast.error(`You must attempt all ${examquestionlistid.length} questions before accessing bonus questions. (${attemptedCount}/${examquestionlistid.length} attempted, ${reviewCount} marked for review)`, {
+      toast.error(`You must answer all ${examquestionlistid.length - 12} questions before accessing bonus questions. (${attemptedCount}/${examquestionlistid.length - 12} answered, ${reviewCount} marked for review, ${reviewedButNotAnsweredCount} marked for review but not answered)`, {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -254,7 +296,7 @@ function SolvePaper() {
   const LoadingScreen = () => {
     const [dots, setDots] = useState("");
     const [progressStep, setProgressStep] = useState(0);
-    const steps = ["Gathering questions...", "Checking answers...", "Calculating score...", "Preparing results..."];
+    const steps = ["Gathering questions...", "Processing answers...", "Calculating score...", "Preparing results..."];
 
     // Animate the dots
     useEffect(() => {
@@ -264,15 +306,36 @@ function SolvePaper() {
           return prev + ".";
         });
       }, 400);
-
-      // Progress through the steps
+            // Progress through the steps
       const progressInterval = setInterval(() => {
         setProgressStep(prev => (prev < steps.length - 1 ? prev + 1 : prev));
       }, 1200);
 
+
       return () => {
         clearInterval(dotsInterval);
         clearInterval(progressInterval);
+      };
+    }, []);
+
+    // Progress through the steps more slowly to match our onSubmit timing
+    useEffect(() => {
+      // Start with step 0
+      setProgressStep(0);
+
+      // Move to step 1 after 1 second
+      const timer1 = setTimeout(() => setProgressStep(1), 1000);
+
+      // Move to step 2 after 3 seconds (when questions are fetched)
+      const timer2 = setTimeout(() => setProgressStep(2), 3000);
+
+      // Move to step 3 after 5 seconds (when score is calculated)
+      const timer3 = setTimeout(() => setProgressStep(3), 5000);
+
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
       };
     }, []);
 
@@ -316,7 +379,16 @@ function SolvePaper() {
   };
 
   const ResultScreen = () => {
-    const percentage = ((score / examquestionlistid.length) * 100).toFixed(2);
+    console.log("Rendering ResultScreen");
+    console.log("Questions:", examquestionlist.length);
+    console.log("User options:", useroptionlist);
+    console.log("Correct options:", correctoptionlist);
+    console.log("Score:", score);
+
+    // Ensure we have all the data before calculating the percentage
+    const percentage = examquestionlistid.length > 0
+      ? ((score / examquestionlistid.length) * 100).toFixed(2)
+      : 0;
     const renderOption = (optionKey, optionText, userAnswer, correctAnswer) => {
       let border = "border-gray-300";
       let icon = null;
@@ -344,7 +416,7 @@ function SolvePaper() {
     };
 
     return (
-      <div className="flex flex-col p-4">
+      <div className="flex flex-col p-4 pb-20 overflow-y-auto">
         <div className="flex flex-col items-center justify-center p-4">
           <div className="p-8 rounded-xl shadow-xl text-center text-gray-800 w-full sm:w-[400px]">
             <h1 className="text-3xl font-bold text-blue-600">Quiz Results</h1>
@@ -367,25 +439,31 @@ function SolvePaper() {
             </button>
           </div>
         </div>
-        {examquestionlist.map((q, index) => (
-          <div
-            key={index}
-            className="mb-6 p-4 border rounded-lg shadow-sm bg-white"
-          >
-            <h2 className="font-semibold mb-2">
-              Q{index + 1}. {parseTextWithImages(q.question)}
-            </h2>
-            {["op1", "op2", "op3", "op4"].map((key, i) => {
-              const optionText = q[`option${i + 1}`];
-              return renderOption(
-                key,
-                optionText,
-                useroptionlist[index],
-                correctoptionlist[index]
-              );
-            })}
+        {examquestionlist && examquestionlist.length > 0 ? (
+          examquestionlist.map((q, index) => (
+            <div
+              key={index}
+              className="mb-6 p-4 border rounded-lg shadow-sm bg-white"
+            >
+              <h2 className="font-semibold mb-2">
+                Q{index + 1}. {parseTextWithImages(q.question)}
+              </h2>
+              {["op1", "op2", "op3", "op4"].map((key, i) => {
+                const optionText = q[`option${i + 1}`];
+                return renderOption(
+                  key,
+                  optionText,
+                  useroptionlist[index],
+                  correctoptionlist[index]
+                );
+              })}
+            </div>
+          ))
+        ) : (
+          <div className="text-center p-4 bg-yellow-100 rounded-lg border border-yellow-300">
+            <p className="text-yellow-800">No questions to display. Please try again.</p>
           </div>
-        ))}
+        )}
         <button
           className="mt-6 px-6 py-2 w-full bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg shadow-md"
           onClick={() => window.location.reload()}
@@ -400,7 +478,7 @@ function SolvePaper() {
     return (
       <div
         ref={sidebarRef}
-        className={`fixed h-[70vh] overflow-y-auto top-12 left-0 z-40 transform transition-transform duration-300 ease-in-out border-r border-gray-200 bg-white ${
+        className={`fixed h-[70vh] pb-10 overflow-y-auto top-12 left-0 z-40 transform transition-transform duration-300 ease-in-out border-r border-gray-200 bg-white ${
           showSidebar ? "translate-x-0 w-20 sm:w-24" : "-translate-x-full w-0"
         }`}
         style={{
@@ -444,13 +522,18 @@ function SolvePaper() {
                   if (!isDisabled) setCurrentQuestionIndex(index);
                 }}
                 className={`rounded-full w-10 h-10 text-sm flex items-center justify-center font-semibold border-2 ${
-                  reviewQuestions.includes(index)
-                    ? "bg-blue-500 text-white border-blue-600" // Blue for review
+                  // Determine the background color based on the question status
+                  reviewQuestions.includes(index) && useroptionlist[index]
+                    ? "bg-gradient-to-r from-blue-500 to-green-500 text-white border-blue-600" // Blue-green gradient for review + answered
+                    : reviewQuestions.includes(index)
+                    ? "bg-blue-500 text-white border-blue-600" // Blue for review but not answered
                     : useroptionlist[index]
-                    ? "bg-green-500 text-white border-green-600" // Green for attempted
+                    ? "bg-green-500 text-white border-green-600" // Green for answered
+                    : visitedQuestions.includes(index)
+                    ? "bg-red-500 text-white border-red-600" // Red for visited but not answered
                     : isBonusQuestion && !isDisabled
                     ? "bg-yellow-100 border-yellow-300" // Yellow for bonus
-                    : "bg-gray-100 border-gray-300" // Gray for unattempted
+                    : "bg-white border-gray-300" // White for not visited
                 } ${
                   index === currentQuestionIndex ? "ring-2 ring-blue-400" : ""
                 } ${isDisabled ? "opacity-40 cursor-not-allowed" : ""}`}
@@ -467,9 +550,9 @@ function SolvePaper() {
   };
 
   return (
-    <div>
+    <div className="min-h-screen overflow-hidden">
       <Sidebar />
-      <div className="flex min-h-screen overflow-auto pt-16">
+      <div className="min-h-screen overflow-y-auto pt-16 pb-16">
         <div
           className={`flex-1 flex flex-col transition-all duration-300 ${
             showSidebar ? "ml-20 sm:ml-24" : "ml-0"
@@ -480,14 +563,18 @@ function SolvePaper() {
             toggleSidebar={() => setShowSidebar(!showSidebar)}
             showsubmit={showsubmit}
             onSubmit={onSubmit}
+            setHandleSubmit={setHandleSubmitFn}
           />
           {isCalculating ? (
             <LoadingScreen />
-          ) : showsubmit ? (
+          ) : showsubmit && examquestionlist.length > 0 && score !== undefined ? (
             <ResultScreen />
+          ) : showsubmit ? (
+            // If showsubmit is true but data isn't ready yet, show loading screen
+            <LoadingScreen />
           ) : (
-            <div className="p-4">
-              <p>Question{currentQuestionIndex+1}:</p>
+            <div className="p-4 pb-20 overflow-y-auto">
+              <p className="font-medium text-lg">Question {currentQuestionIndex+1}:</p>
               <SolveexamWithMathlive
                 currentquestion={currentquestion}
                 option={useroptionlist[currentQuestionIndex] || ""}
@@ -497,7 +584,7 @@ function SolvePaper() {
                 toggleReview={() => toggleReviewQuestion(currentQuestionIndex)}
               />
               {!isCalculating && (
-                <div className="mt-4 bg-slate-700 flex items-center px-4 fixed z-50 left-1 right-1 border-slate-400 bottom-0 h-12 rounded-t-3xl border-b-2 justify-between">
+                <div className="mt-4 bg-slate-700 flex items-center px-4 fixed z-50 left-1 right-1 border-slate-400 bottom-0 h-14 rounded-t-3xl border-b-2 justify-between shadow-lg">
                 <button
                   onClick={() => {
                     // If in bonus mode, show confirmation dialog
@@ -525,7 +612,7 @@ function SolvePaper() {
                 )}
 
                 <button
-                  onClick={onSubmit}
+                  onClick={() => handleSubmitFn ? handleSubmitFn() : onSubmit()}
                   className="px-4 py-2 text-white rounded"
                 >
                   Submit
@@ -539,23 +626,26 @@ function SolvePaper() {
 
                     // If trying to enter bonus section, check if all questions are attempted
                     if (isEnteringBonusSection) {
-                      // Count questions that are truly attempted (not marked for review)
-                      const attemptedCount = useroptionlist.reduce((count, option, index) => {
-                        // Only count if option is defined AND not marked for review
-                        if (option !== undefined && !reviewQuestions.includes(index)) {
+                      // Count questions that are answered (including those marked for review)
+                      const attemptedCount = useroptionlist.reduce((count, option) => {
+                        // Count if option is defined (regardless of review status)
+                        if (option !== undefined) {
                           return count + 1;
                         }
                         return count;
                       }, 0);
 
                       // Check if all questions have been attempted
-                      const allQuestionsAttempted = attemptedCount >= examquestionlistid.length;
+                      const allQuestionsAttempted = attemptedCount >= examquestionlistid.length - 12;
 
                       // Count questions marked for review
                       const reviewCount = reviewQuestions.length;
 
                       if (!allQuestionsAttempted) {
-                        toast.error(`Complete all ${examquestionlistid.length} questions to unlock bonus questions (${attemptedCount}/${examquestionlistid.length} attempted, ${reviewCount} marked for review)`, {
+                        // Count questions that are marked for review but not answered
+                        const reviewedButNotAnsweredCount = reviewQuestions.filter(index => !useroptionlist[index]).length;
+
+                        toast.error(`You must answer all ${examquestionlistid.length - 12} questions to unlock bonus questions. (${attemptedCount}/${examquestionlistid.length - 12} answered, ${reviewCount} marked for review, ${reviewedButNotAnsweredCount} marked for review but not answered)`, {
                           position: "bottom-right",
                           autoClose: 5000,
                           hideProgressBar: false,
@@ -582,7 +672,7 @@ function SolvePaper() {
                       enterBonusMode();
                     } else if (isLastQuestion) {
                       // If at last question, submit the quiz
-                      onSubmit();
+                      handleSubmitFn ? handleSubmitFn() : onSubmit();
                     } else {
                       // Normal next button behavior
                       setCurrentQuestionIndex((prev) =>
