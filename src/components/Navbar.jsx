@@ -7,7 +7,7 @@ function Navbar() {
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
   return (
-    <nav className="bg-white shadow-md fixed z-[100] left-0 right-0">
+    <nav className="bg-white shadow-md fixed z-[100] left-0 right-0 w-full">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-4">
         {/* Logo */}
         <div className="flex items-center">
@@ -129,11 +129,11 @@ function Navbar() {
         <>
           {/* Overlay to close menu when clicking outside */}
           <div
-            className="fixed inset-0 bg-black bg-opacity-25 md:hidden z-10"
+            className="fixed inset-0 bg-black bg-opacity-25 md:hidden z-[100]"
             onClick={() => setMenuOpen(false)}
             aria-hidden="true"
           ></div>
-          <div className="md:hidden bg-white shadow-md absolute w-full left-0 top-[72px] border-t border-gray-100 z-20">
+          <div className="md:hidden bg-white shadow-md absolute w-full left-0 top-[72px] border-t border-gray-100 z-[101]">
             <ul className="flex flex-col items-center space-y-4 font-semibold py-6 px-4 text-gray-400">
             {["Home", "About", "Practice", "Mock", "Pricing", "FAQ", "Contact"].map(
               (item) => (

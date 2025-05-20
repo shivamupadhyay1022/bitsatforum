@@ -20,7 +20,7 @@ const Instructions = () => {
   return (
     <div className="bg-gray-100 min-h-screen flex items-center justify-center py-10">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl p-8">
-        <h1 className="text-2xl font-semibold text-gray-800 mb-6 text-center">BITSAT 2024 - Instructions</h1>
+        <h1 className="text-2xl font-semibold text-gray-800 mb-6 text-center">BITSAT 2025 - Instructions</h1>
         <div className="space-y-4 text-gray-700 text-sm">
           <h2 className="text-lg font-semibold text-gray-800">Exam Interface Guide:</h2>
           <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
@@ -166,7 +166,7 @@ const Instructions = () => {
             </li>
           </ul>
 
-          <h2 className="text-lg font-semibold text-gray-800">BITSAT 2024 Exam Pattern:</h2>
+          <h2 className="text-lg font-semibold text-gray-800">BITSAT 2025 Exam Pattern:</h2>
           <div className="ml-5 mb-4">
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
               <table className="min-w-full">
@@ -290,13 +290,52 @@ const Instructions = () => {
           </div>
 
           <h2 className="text-lg font-semibold text-gray-800">Important Dates:</h2>
-          <ul className="list-disc list-inside space-y-2 ml-5">
-            <li>Registration Start Date: 1st February 2024</li>
-            <li>Registration End Date: 15th May 2024</li>
-            <li>Exam Dates: 21st May 2024 to 26th June 2024</li>
-            <li>Admit Card Release Date: 15th May 2024</li>
-            <li>Result Declaration: 5th July 2024</li>
-          </ul>
+          <div className="ml-5 mb-4">
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <p className="mb-3 text-sm">
+                BITSAT 2025 will be conducted in two sessions: Session 1 from May 26 to 30, 2025, and Session 2 from June 22 to 26, 2025.
+                The application window for Session 2 only opens from May 26 to June 10, 2025. Candidates can apply for either Session 1, Session 2, or both.
+              </p>
+              <table className="min-w-full">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-2 px-3 font-medium">Event</th>
+                    <th className="text-left py-2 px-3 font-medium">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-gray-100">
+                    <td className="py-2 px-3">Application Window (Session 1 & 2)</td>
+                    <td className="py-2 px-3">April 18, 2025</td>
+                  </tr>
+                  <tr className="border-b border-gray-100">
+                    <td className="py-2 px-3">Application Window (Session 2 only)</td>
+                    <td className="py-2 px-3">May 26 to June 10, 2025</td>
+                  </tr>
+                  <tr className="border-b border-gray-100">
+                    <td className="py-2 px-3">Session 1 Exam Dates</td>
+                    <td className="py-2 px-3">May 26 to 30, 2025</td>
+                  </tr>
+                  <tr className="border-b border-gray-100">
+                    <td className="py-2 px-3">Session 2 Exam Dates</td>
+                    <td className="py-2 px-3">June 22 to 26, 2025</td>
+                  </tr>
+                  <tr className="border-b border-gray-100">
+                    <td className="py-2 px-3">Test Date & Slot Reservation (Session 1)</td>
+                    <td className="py-2 px-3">May 13-16, 2025</td>
+                  </tr>
+                  <tr className="border-b border-gray-100">
+                    <td className="py-2 px-3">Test Center Allotment Announcement</td>
+                    <td className="py-2 px-3">June 16, 2025</td>
+                  </tr>
+                  <tr className="border-b border-gray-100">
+                    <td className="py-2 px-3">Hall Ticket Download</td>
+                    <td className="py-2 px-3">June 20, 2025</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
         {/* Checkboxes and Button */}

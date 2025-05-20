@@ -9,7 +9,7 @@ import Navbar from "../components/Navbar";
 
 function Home() {
   return (
-    <div>
+    <div className="flex flex-col overflow-x-hidden relative" >
       <Navbar/>
       <Hero />
       <Features/>
