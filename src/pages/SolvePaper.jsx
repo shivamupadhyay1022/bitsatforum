@@ -177,8 +177,22 @@ function SolvePaper() {
         // Step 3: Calculate the score
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        const calculatedScore = newCorrectOptions.reduce((acc, curr, index) => {
-          return useroptionlist[index] === curr ? acc + 1 : acc;
+        // Calculate score using BITSAT marking scheme: +3 for correct, -1 for wrong, 0 for unattempted
+        const calculatedScore = newCorrectOptions.reduce((acc, correctOption, index) => {
+          const userOption = useroptionlist[index];
+
+          // If user didn't attempt this question
+          if (userOption === undefined) {
+            return acc; // No change to score (0)
+          }
+
+          // If user's answer is correct
+          if (userOption === correctOption) {
+            return acc + 3; // Add 3 points
+          }
+
+          // If user's answer is wrong
+          return acc - 1; // Subtract 1 point
         }, 0);
 
         // Step 4: Prepare the results display
@@ -386,8 +400,9 @@ function SolvePaper() {
     console.log("Score:", score);
 
     // Ensure we have all the data before calculating the percentage
-    const percentage = examquestionlistid.length > 0
-      ? ((score / examquestionlistid.length) * 100).toFixed(2)
+    const maxPossibleScore = examquestionlistid.length * 3; // Each question is worth 3 points
+    const percentage = maxPossibleScore > 0
+      ? ((score / maxPossibleScore) * 100).toFixed(2)
       : 0;
     const renderOption = (optionKey, optionText, userAnswer, correctAnswer) => {
       let border = "border-gray-300";
@@ -427,7 +442,7 @@ function SolvePaper() {
               </div>
               <span className="text-xl font-bold text-gray-500 mx-4">/</span>
               <span className="text-3xl font-extrabold text-gray-700">
-                {examquestionlistid.length}
+                {examquestionlistid.length * 3}
               </span>
             </div>
             <p className="mt-4 text-lg text-gray-500">{percentage}% Correct</p>
