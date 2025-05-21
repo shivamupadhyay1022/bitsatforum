@@ -399,8 +399,41 @@ function SolvePaper() {
     console.log("Correct options:", correctoptionlist);
     console.log("Score:", score);
 
+    // Calculate detailed statistics
+    const totalQuestions = examquestionlistid.length;
+    const regularQuestions = totalQuestions - 12; // 130 regular questions
+    const bonusQuestions = 12; // 12 bonus questions
+
+    // Count attempted, correct, and incorrect questions
+    let attemptedCount = 0;
+    let correctCount = 0;
+    let incorrectCount = 0;
+
+    useroptionlist.forEach((userOption, index) => {
+      const correctOption = correctoptionlist[index];
+
+      // Count attempted questions
+      if (userOption !== undefined) {
+        attemptedCount++;
+
+        // Count correct and incorrect questions
+        if (userOption === correctOption) {
+          correctCount++;
+        } else {
+          incorrectCount++;
+        }
+      }
+    });
+
+    // Calculate unattempted questions
+    const unattemptedCount = totalQuestions - attemptedCount;
+
+    // Calculate score breakdown
+    const correctScore = correctCount * 3; // +3 for each correct answer
+    const incorrectScore = incorrectCount * -1; // -1 for each incorrect answer
+
     // Ensure we have all the data before calculating the percentage
-    const maxPossibleScore = examquestionlistid.length * 3; // Each question is worth 3 points
+    const maxPossibleScore = totalQuestions * 3; // Each question is worth 3 points
     const percentage = maxPossibleScore > 0
       ? ((score / maxPossibleScore) * 100).toFixed(2)
       : 0;
@@ -433,7 +466,7 @@ function SolvePaper() {
     return (
       <div className="flex flex-col p-4 pb-20 overflow-y-auto">
         <div className="flex flex-col items-center justify-center p-4">
-          <div className="p-8 rounded-xl shadow-xl text-center text-gray-800 w-full sm:w-[400px]">
+          <div className="p-8 rounded-xl shadow-xl text-center text-gray-800 w-full sm:w-[500px]">
             <h1 className="text-3xl font-bold text-blue-600">Quiz Results</h1>
             <p className="text-lg font-medium text-gray-700">Your Score</p>
             <div className="mt-4 flex justify-center items-center">
@@ -446,6 +479,58 @@ function SolvePaper() {
               </span>
             </div>
             <p className="mt-4 text-lg text-gray-500">{percentage}% Correct</p>
+
+            {/* Score Breakdown */}
+            <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200 text-left">
+              <h2 className="text-lg font-semibold text-gray-800 mb-3">Score Breakdown</h2>
+
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <p className="text-sm text-gray-600">Total Questions</p>
+                  <p className="text-xl font-bold text-gray-800">{totalQuestions}</p>
+                  <p className="text-xs text-gray-500">(130 Regular + 12 Bonus)</p>
+                </div>
+                <div className="bg-green-50 p-3 rounded-lg">
+                  <p className="text-sm text-gray-600">Attempted</p>
+                  <p className="text-xl font-bold text-gray-800">{attemptedCount}</p>
+                  <p className="text-xs text-gray-500">({((attemptedCount/totalQuestions)*100).toFixed(1)}% of total)</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <div className="bg-green-50 p-3 rounded-lg">
+                  <p className="text-sm text-gray-600">Correct</p>
+                  <p className="text-xl font-bold text-green-600">{correctCount}</p>
+                </div>
+                <div className="bg-red-50 p-3 rounded-lg">
+                  <p className="text-sm text-gray-600">Incorrect</p>
+                  <p className="text-xl font-bold text-red-600">{incorrectCount}</p>
+                </div>
+                <div className="bg-gray-100 p-3 rounded-lg">
+                  <p className="text-sm text-gray-600">Unattempted</p>
+                  <p className="text-xl font-bold text-gray-600">{unattemptedCount}</p>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 p-3 rounded-lg mb-4">
+                <h3 className="text-sm font-medium text-gray-700 mb-2">Marks Calculation</h3>
+                <div className="grid grid-cols-3 gap-2 text-sm">
+                  <div>
+                    <p className="text-gray-600">Correct</p>
+                    <p className="font-semibold text-green-600">+{correctCount} × 3 = +{correctScore}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Incorrect</p>
+                    <p className="font-semibold text-red-600">{incorrectCount} × (-1) = {incorrectScore}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Total</p>
+                    <p className="font-semibold text-blue-600">{score}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <button
               className="mt-6 px-6 py-2 w-full bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg shadow-md"
               onClick={() => window.location.reload()}
