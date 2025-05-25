@@ -13,6 +13,7 @@ import Mock from "./pages/Mock";
 import Pricing from "./pages/Pricing";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
+import QuestionPage from "./pages/QuestionPage";
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/instructions/:id" element={<Instructions />} />
         <Route path="/paper/:id" element={<SolvePaper />} />
+        <Route path="/questions/:exam/:subject" element={<QuestionPage />} />
       </Routes>
     </>
   );

@@ -65,29 +65,30 @@ const YearSection = ({ year, sessions }) => (
 
 const Practice = () => {
   const [bitsat2024Sessions, setBitsat2024Sessions] = useState([]);
+  const [bitsat2025Sessions, setBitsat2025Sessions] = useState([]);
 
   useEffect(() => {
-    const fetchExams = async () => {
-      const { data, error } = await supabase
-        .from("exams")
-        .select("id,Name,Duration")
-        .ilike("Tags", "%BITSAT_2024%");
-
-      if (error) return;
-
-      const formatted = data.map((exam, idx) => ({
-        name: exam.Name || `Sample Test Paper ${idx + 1}`,
-        questions: "150 Questions",
-        time: `${exam.Duration || 180} mins`,
-        practiceLink: `/instructions/${exam.id}`,
-        downloadLink: "#",
-      }));
-
-      setBitsat2024Sessions(formatted);
-    };
-
-    fetchExams();
+    fetch2024Exams();
   }, []);
+
+  const fetch2024Exams = async () => {
+    const { data, error } = await supabase
+      .from("exams")
+      .select("id,Name,Duration")
+      .ilike("Tags", "%BITSAT 2024%");
+
+    if (error) return;
+
+    const formatted = data.map((exam, idx) => ({
+      name: exam.Name || `Sample Test Paper ${idx + 1}`,
+      questions: "150 Questions",
+      time: `${exam.Duration || 180} mins`,
+      practiceLink: `/instructions/${exam.id}`,
+      downloadLink: "#",
+    }));
+
+    setBitsat2024Sessions(formatted);
+  };
 
   return (
     <div>
@@ -101,52 +102,112 @@ const Practice = () => {
             Access previous years&apos; BITSAT question papers with detailed
             solutions and expert analysis.
           </p>
-      {/* Features Section */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
-        {/* Feature 1 */}
-        <div className="bg-gray-50 p-6 rounded-lg text-center">
-          <div className="flex justify-center mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <h3 className="font-semibold text-gray-800 mb-2">Real-Time Environment</h3>
-          <p className="text-sm text-gray-600">Experience the actual BITSAT exam interface and timing.</p>
-        </div>
+          {/* Features Section */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
+            {/* Feature 1 */}
+            <div className="bg-gray-50 p-6 rounded-lg text-center">
+              <div className="flex justify-center mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 text-blue-800"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">
+                Real-Time Environment
+              </h3>
+              <p className="text-sm text-gray-600">
+                Experience the actual BITSAT exam interface and timing.
+              </p>
+            </div>
 
-        {/* Feature 2 */}
-        <div className="bg-gray-50 p-6 rounded-lg text-center">
-          <div className="flex justify-center mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-          </div>
-          <h3 className="font-semibold text-gray-800 mb-2">Peer Comparison</h3>
-          <p className="text-sm text-gray-600">Compare your performance with other test takers.</p>
-        </div>
+            {/* Feature 2 */}
+            <div className="bg-gray-50 p-6 rounded-lg text-center">
+              <div className="flex justify-center mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 text-blue-800"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">
+                Peer Comparison
+              </h3>
+              <p className="text-sm text-gray-600">
+                Compare your performance with other test takers.
+              </p>
+            </div>
 
-        {/* Feature 3 */}
-        <div className="bg-gray-50 p-6 rounded-lg text-center">
-          <div className="flex justify-center mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </div>
-          <h3 className="font-semibold text-gray-800 mb-2">Detailed Analysis</h3>
-          <p className="text-sm text-gray-600">Get comprehensive performance reports and insights.</p>
-        </div>
+            {/* Feature 3 */}
+            <div className="bg-gray-50 p-6 rounded-lg text-center">
+              <div className="flex justify-center mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 text-blue-800"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">
+                Detailed Analysis
+              </h3>
+              <p className="text-sm text-gray-600">
+                Get comprehensive performance reports and insights.
+              </p>
+            </div>
 
-        {/* Feature 4 */}
-        <div className="bg-gray-50 p-6 rounded-lg text-center">
-          <div className="flex justify-center mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
+            {/* Feature 4 */}
+            <div className="bg-gray-50 p-6 rounded-lg text-center">
+              <div className="flex justify-center mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 text-blue-800"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">
+                Expert-Crafted
+              </h3>
+              <p className="text-sm text-gray-600">
+                Questions designed by BITS Pilani alumni and experts.
+              </p>
+            </div>
           </div>
-          <h3 className="font-semibold text-gray-800 mb-2">Expert-Crafted</h3>
-          <p className="text-sm text-gray-600">Questions designed by BITS Pilani alumni and experts.</p>
-        </div>
-      </div>
           <YearSection year="BITSAT 2024" sessions={bitsat2024Sessions} />
 
           {/* <YearSection
