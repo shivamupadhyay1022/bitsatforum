@@ -6,6 +6,7 @@ import Stats from "../components/Stats";
 import Testimonials from "../components/Testimonials";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
+import ExamPatternSection from "../components/ExamPatternSection";
 
 function Home() {
   return (
@@ -13,6 +14,7 @@ function Home() {
       <Navbar/>
       <Hero />
       <Features/>
+      <ExamPatternSection/>
       <GetStartedSection/>
       <Stats/>
       <Testimonials/>

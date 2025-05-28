@@ -1,6 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function Hero() {
+  const navigate = useNavigate()
   return (
     <section className="flex flex-col items-center justify-center min-h-screen pt-20 text-center bg-gray-200 px-4">
       <div className="relative z-10 max-w-3xl">
@@ -13,10 +15,10 @@ function Hero() {
           progress with our comprehensive preparation platform.
         </p>
         <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
-          <button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded transition">
+          <button onClick={()=>navigate("/practice")} className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded transition">
             Start Practicing Now
           </button>
-          <button className="border border-blue-700 text-blue-700 hover:bg-blue-50 font-semibold py-3 px-6 rounded transition">
+          <button onClick={()=>navigate("/about")} className="border border-blue-700 text-blue-700 hover:bg-blue-50 font-semibold py-3 px-6 rounded transition">
             Learn More
           </button>
         </div>

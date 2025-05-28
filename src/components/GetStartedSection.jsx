@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
 export default function GetStartedSection() {
+    const navigate = useNavigate()
     const steps = [
       "Sign up for a free account",
       "Choose your target topics",
@@ -40,7 +43,7 @@ export default function GetStartedSection() {
               ))}
             </ul>
   
-            <button className="mt-8 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md font-medium inline-flex items-center gap-2 transition">
+            <button onClick={()=>{navigate("/login")}} className="mt-8 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md font-medium inline-flex items-center gap-2 transition">
               Start Now
               <svg
                 xmlns="http://www.w3.org/2000/svg"
