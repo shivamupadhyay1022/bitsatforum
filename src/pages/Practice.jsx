@@ -81,7 +81,7 @@ const Practice = () => {
 
     const formatted = data.map((exam, idx) => ({
       name: exam.Name || `Sample Test Paper ${idx + 1}`,
-      questions: "150 Questions",
+      questions: "130 + 12 Bonus Questions ",
       time: `${exam.Duration || 180} mins`,
       practiceLink: `/instructions/${exam.id}`,
       downloadLink: "#",
